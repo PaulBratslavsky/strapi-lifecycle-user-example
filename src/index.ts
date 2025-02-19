@@ -1,3 +1,7 @@
+// TODO: This only applies to users-permissions plugin.
+// For anything else please reference the following guide:
+// https://strapi.io/blog/what-are-document-service-middleware-and-what-happened-to-lifecycle-hooks-1
+
 import type { Core } from "@strapi/strapi";
 
 function generateUsername(): string {
@@ -78,10 +82,7 @@ export default {
       models: ["plugin::users-permissions.user"], // Specify the User model
 
       async afterCreate(event: any) {
-        console.log("FROM AFTER CREATE FUNCTION", event);
         const { result, params } = event;
-        console.log(result, "RESULT");
-        console.log(params?.data?.fullName, "PARAMS");
         const fullName = params?.data?.fullName;
         await createUserProfile(result.id, fullName);
       },
