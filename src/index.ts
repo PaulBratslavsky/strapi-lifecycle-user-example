@@ -30,7 +30,7 @@ async function checkIfUserProfileExists(userId: string) {
   return existingUserProfile;
 }
 
-async function createUserProfile(userId: string) {
+async function createUserProfile(userId: string, fullName: string) {
   const userProfile = await checkIfUserProfileExists(userId);
 
   if (userProfile.length > 0) {
@@ -41,7 +41,7 @@ async function createUserProfile(userId: string) {
   await strapi.documents("api::user-profile.user-profile").create({
     data: {
       user: userId,
-      name: generateUsername(),
+      name: fullName || generateUsername(),
     },
   });
 }
@@ -78,9 +78,14 @@ export default {
       models: ["plugin::users-permissions.user"], // Specify the User model
 
       async afterCreate(event: any) {
-        const { result } = event;
-        await createUserProfile(result.id);
+        console.log("FROM AFTER CREATE FUNCTION", event);
+        const { result, params } = event;
+        console.log(result, "RESULT");
+        console.log(params?.data?.fullName, "PARAMS");
+        const fullName = params?.data?.fullName;
+        await createUserProfile(result.id, fullName);
       },
+
 
       async beforeDelete(event: any) {
         const { params } = event;
